@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Guess the Video Game</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      h1 {
+        text-align: center;
+      }
+
+      .message {
+        font-size: 20px;
+      }
+
+      .options {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      img {
+        width: 700px;
+        height: 400px;
+        aspect-ratio: 16/9;
+        object-fit: cover;
+      }
+
+      @media screen and (max-width: 700px) {
+        .options {
+          width: 100%;
+          flex-direction: column;
+        }
+
+        .options button {
+          width: 100%;
+        }
+
+        img {
+          width: 100%;
+          height: 200px;
+        }
+      }
+    </style>
+  </head>
+  <body data-answer="{{.answer}}">
+    <h1>Guess the Video Game</h1>
+
+    <p class="message"></p>
+    <p class="score"></p>
+
+    <img src="{{.screenshot}}" alt="" />
+
+    <div class="options">
+      {{ range $key, $game := .games }}
+      <button data-game="{{$game.Id}}">{{ $game.Name }}</button>
+      {{ end }}
+    </div>
+
+    <script>
+      const message = document.querySelector(".message");
+      const scoreEl = document.querySelector(".score");
+
+      const scoreCount = localStorage.getItem("score") ?? 0;
+      scoreEl.innerText = `Score: ${scoreCount}`;
+
+      const buttons = [...document.querySelectorAll("button[data-game]")];
+      buttons.forEach((button) => {
+        button.addEventListener("click", (e) => {
+          const game = e.target.dataset.game;
+          const answer = document.body.dataset.answer;
+
+          if (game === answer) {
+            message.innerText = "You're correct";
+
+            const score = localStorage.getItem("score");
+            if (!score) {
+              localStorage.setItem("score", 1);
+            } else {
+              localStorage.setItem("score", +score + 1);
+            }
+          } else {
+            message.innerText = "No, better luck next time";
+          }
+
+          window.setTimeout(() => location.reload(), 1000);
+        });
+      });
+    </script>
+  </body>
+</html>
